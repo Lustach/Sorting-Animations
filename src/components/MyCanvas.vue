@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <div id="tooltip" display="none" style="position: absolute; display: none"></div>
-    <svg id="my-svg" :width="panelWidth" :height="panelHeight">
+    <svg id="my-svg" :width="canvasWidth" :height="canvasHeight">
       <g
-        v-for="(item, index) in data"
+        v-for="(item, index) in dataList"
         class="bar"
         shape-rendering="crispEdges"
         :class="[
@@ -13,49 +13,32 @@
         ]"
       >
         <rect
-          v-bind="{ x: index * barWidth, y: panelHeight - item * heightRatio }"
+          v-bind="{ x: index * barWidth, y: canvasHeight - item * heightRatio }"
           :width="barWidth"
           :height="item * heightRatio"
-          class="test"
           @mousemove="showTooltip($event, item)"
           @mouseout="hideTooltip()"
         />
-        <text
-          v-bind="{ x: index * barWidth, y: panelHeight - item * heightRatio }"
-          font-family="Verdana"
-          font-size="10"
-          fill="blue"
-        ></text>
       </g>
       <g v-if="m >= 0" class="bar selected" shape-rendering="crispEdges">
         <rect
-          v-bind="{ x: (m + diff) * barWidth, y: panelHeight - data[m] * heightRatio }"
+          v-bind="{
+            x: (m + diff) * barWidth,
+            y: canvasHeight - dataList[m] * heightRatio,
+          }"
           :width="barWidth"
-          :height="data[m] * heightRatio"
+          :height="dataList[m] * heightRatio"
         />
-        <text
-          v-bind="{ x: index * barWidth, y: panelHeight - item * heightRatio }"
-          font-family="Verdana"
-          font-size="10"
-          fill="blue"
-        >
-          1
-        </text>
       </g>
       <g v-if="n >= 0" class="bar selected" shape-rendering="crispEdges">
         <rect
-          v-bind="{ x: (n - diff) * barWidth, y: panelHeight - data[n] * heightRatio }"
+          v-bind="{
+            x: (n - diff) * barWidth,
+            y: canvasHeight - dataList[n] * heightRatio,
+          }"
           :width="barWidth"
-          :height="data[n] * heightRatio"
+          :height="dataList[n] * heightRatio"
         />
-        <text
-          v-bind="{ x: index * barWidth, y: panelHeight - item * heightRatio }"
-          font-family="Verdana"
-          font-size="10"
-          fill="blue"
-        >
-          1
-        </text>
       </g>
     </svg>
   </div>
@@ -72,12 +55,12 @@ export default {
       this.peeking = -1;
       this.assigning = -1;
     });
-    this.emitter.on("generateData", (data) => {
+    this.emitter.on("generateData", (dataList) => {
       if (this.sorting) {
-        alert("Can't change data while sorting");
+        alert("Can't change dataList while sorting");
         return;
       }
-      this.data = data;
+      this.dataList = dataList;
       this.onResize(); // call onResize to make the bars right size
     });
     this.emitter.on("setSpeed", (speed) => {
@@ -86,7 +69,7 @@ export default {
   },
   mounted() {
     for (let i = 1; i <= 100; i++) {
-      this.data.push(i);
+      this.dataList.push(i);
     }
     window.addEventListener("resize", this.onResize);
     this.onResize(); // call onResize to make the bars right size
@@ -94,22 +77,20 @@ export default {
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
   },
-  data() {
-    return {
-      data: [],
-      panelWidth: 1,
-      panelHeight: 1,
-      maxHeight: 1,
-      m: -1,
-      n: -1,
-      peeking: -1,
-      assigning: -1,
-      diff: 0,
-      step: 1,
-      sorting: false,
-      speed: 100,
-    };
-  },
+  data: () => ({
+    dataList: [],
+    canvasWidth: 1,
+    canvasHeight: 1,
+    maxHeight: 1,
+    m: -1,
+    n: -1,
+    peeking: -1,
+    assigning: -1,
+    diff: 0,
+    step: 1,
+    sorting: false,
+    speed: 0,
+  }),
   methods: {
     showTooltip(mouseEvent, text) {
       let tooltip = document.getElementById("tooltip");
@@ -127,23 +108,23 @@ export default {
     },
     onResize() {
       let mySvg = document.querySelector("#my-svg");
-      this.panelWidth = mySvg.parentNode.clientWidth;
-      this.panelHeight = mySvg.parentNode.clientHeight;
-      this.maxHeight = Math.max(...this.data);
+      this.canvasWidth = mySvg.parentNode.clientWidth;
+      this.canvasHeight = mySvg.parentNode.clientHeight;
+      this.maxHeight = Math.max(...this.dataList);
     },
     shuffleInst() {
       if (this.sorting) {
         alert("Can't shuffle while sorting");
         return;
       }
-      let currentIndex = this.data.length - 1,
+      let currentIndex = this.dataList.length - 1,
         randomIndex;
       let promise = new Promise((resolve) => {
         while (currentIndex > -1) {
-          randomIndex = (Math.random() * this.data.length) | 0;
-          [this.data[currentIndex], this.data[randomIndex]] = [
-            this.data[randomIndex],
-            this.data[currentIndex],
+          randomIndex = (Math.random() * this.dataList.length) | 0;
+          [this.dataList[currentIndex], this.dataList[randomIndex]] = [
+            this.dataList[randomIndex],
+            this.dataList[currentIndex],
           ];
           currentIndex -= 1;
         }
@@ -162,7 +143,10 @@ export default {
       console.log(done, step, this.m, this.n);
       return new Promise((resolve) => {
         if (this.diff + step >= done) {
-          [this.data[this.m], this.data[this.n]] = [this.data[this.n], this.data[this.m]];
+          [this.dataList[this.m], this.dataList[this.n]] = [
+            this.dataList[this.n],
+            this.dataList[this.m],
+          ];
           this.m = -1;
           this.n = -1;
           this.diff = 0;
@@ -173,9 +157,9 @@ export default {
           let interval = setInterval(() => {
             if (this.diff < done) this.diff = Math.min(this.diff + step, done);
             else {
-              [this.data[this.m], this.data[this.n]] = [
-                this.data[this.n],
-                this.data[this.m],
+              [this.dataList[this.m], this.dataList[this.n]] = [
+                this.dataList[this.n],
+                this.dataList[this.m],
               ];
               this.m = -1;
               this.n = -1;
@@ -191,12 +175,12 @@ export default {
       this.peeking = n;
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve(this.data[this.peeking]);
+          resolve(this.dataList[this.peeking]);
         }, this.speed);
       });
     },
     assignAt(i, n) {
-      this.data[i] = n;
+      this.dataList[i] = n;
       this.assigning = i;
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -207,10 +191,10 @@ export default {
   },
   computed: {
     barWidth() {
-      return this.panelWidth / this.data.length;
+      return this.canvasWidth / this.dataList.length;
     },
     heightRatio() {
-      return this.panelHeight / this.maxHeight;
+      return this.canvasHeight / this.maxHeight;
     },
   },
 };

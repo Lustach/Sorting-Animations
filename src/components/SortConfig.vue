@@ -1,30 +1,35 @@
 <template>
   <div id="dataPanel">
-    <div>
-      <div class="dataPanel_row">
-        Data Size <input type="number" v-model="dataLength" />
-      </div>
-      <div class="dataPanel_row">
-        Speed <input type="number" v-model="speed" @change="setSpeed" />
-      </div>
+    <div style="display: flex">
+      <MyInput
+        label="Data Size"
+        id="data-size"
+        type="number"
+        v-model:dataLength="dataLength"
+        :modelValue="dataLength"
+        @update:modelValue="dataLength = $event"
+        placeholder="bar count"
+      ></MyInput>
+      <MyInput
+        label="Speed"
+        id="speed"
+        type="number"
+        @update:modelValue="setSpeed"
+        :modelValue="speed"
+        v-model:speed="speed"
+        placeholder="speed delay"
+      ></MyInput>
     </div>
     <div class="dataPanel_row">Repeatition?</div>
     <div class="radio__container">
-      <div>
-        <input
-          type="radio"
-          name="Repeatition_0"
-          checked
-          value="0"
-          v-model="repeatition"
-        />No
-      </div>
-      <div>
-        <input type="radio" name="Repeatition_1" value="1" v-model="repeatition" />Some
-      </div>
-      <div>
-        <input type="radio" name="Repeatition_2" value="2" v-model="repeatition" />A Lot
-      </div>
+      <input
+        type="radio"
+        name="Repeatition_0"
+        checked
+        value="0"
+        v-model="repeatition"
+      />No <input type="radio" name="Repeatition_1" value="1" v-model="repeatition" />Some
+      <input type="radio" name="Repeatition_2" value="2" v-model="repeatition" />A Lot
     </div>
     <MyButton class="dataPanel_row" @click.native="generateData" text>
       <template #title>Generate Data</template>
@@ -34,20 +39,22 @@
 
 <script>
 import MyButton from "@/components/ui/MyButton.vue";
-
+import MyInput from "@/components/ui/MyInput.vue";
 export default {
   components: {
     MyButton,
+    MyInput,
   },
   data() {
     return {
-      dataLength: 100,
-      speed: 0,
+      dataLength: "100",
+      speed: "0",
       repeatition: "0",
     };
   },
   methods: {
-    setSpeed() {
+    setSpeed(value) {
+      this.speed = value;
       this.emitter.emit("setSpeed", this.speed);
     },
     generateData() {
@@ -88,6 +95,8 @@ export default {
 <style scoped>
 .radio__container {
   display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 #dataPanel {

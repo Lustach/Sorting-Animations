@@ -1,15 +1,15 @@
 <script lang="ts">
 import { RouterLink, RouterView } from "vue-router";
 import MyCanvas from "@/components/MyCanvas.vue";
-import Algorithm from "@/components/SortActions.vue";
-import MyData from "@/components/SortConfig.vue";
+import SortActions from "@/components/SortActions.vue";
+import SortConfig from "@/components/SortConfig.vue";
 // import MyAlert from "./components/ui/MyAlert";
 export default {
   name: "App",
   components: {
     MyCanvas,
-    Algorithm,
-    MyData,
+    SortConfig,
+    SortActions,
     // MyAlert,
   },
   created() {
@@ -25,11 +25,16 @@ export default {
   },
   methods: {
     async sort() {
-      let selected = this.$refs.Algorithm.getAlgorithm();
+      let selected = this.$refs.SortActions.getAlgorithm();
       let myCanvas = this.$refs.MyCanvas;
       let beginTime = new Date().getTime();
       if (
-        await selected(myCanvas.data, myCanvas.swap, myCanvas.peekAt, myCanvas.assignAt)
+        await selected(
+          myCanvas.dataList,
+          myCanvas.swap,
+          myCanvas.peekAt,
+          myCanvas.assignAt
+        )
       ) {
         let endTime = new Date().getTime();
         let diffTime = endTime - beginTime;
@@ -51,12 +56,12 @@ export default {
   </div>
   <div id="algorithmPanel" class="panel">
     <div class="container" style="overflow: visible">
-      <algorithm ref="Algorithm" />
+      <sort-actions ref="SortActions" />
     </div>
   </div>
   <div id="dataPanel" class="panel">
     <div class="container">
-      <my-data ref="MyData" />
+      <sort-config ref="SortConfig" />
     </div>
   </div>
   <!-- <RouterView /> -->
@@ -91,8 +96,8 @@ body {
 }
 
 #canvasPanel {
-  height: calc(100% - 200px);
   width: 100%;
+  height: calc(100% - 200px);
 }
 
 #dataPanel {
