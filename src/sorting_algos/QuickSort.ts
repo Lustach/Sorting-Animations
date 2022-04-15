@@ -30,6 +30,7 @@ async function partition(arr: Array<Number>, pivot: number, left: number, right:
 }
 
 async function quickSort(arr: Array<Number>, left: number, right: number, swapFn: Function, peekAt: Function) {
+    console.log(left, right);
     if (left >= right) return
     let pivot = (left / 2 + right / 2) | 0 //avoid overflow
     let partitionIndex = await partition(arr, pivot, left, right, swapFn, peekAt)

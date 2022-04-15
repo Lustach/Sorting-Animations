@@ -135,12 +135,10 @@ export default {
       });
     },
     swap(m, n) {
-      console.log(m, n);
       this.m = Math.min(m, n);
       this.n = Math.max(m, n);
       let done = Math.abs(this.m - this.n);
       let step = done / this.step;
-      console.log(done, step, this.m, this.n);
       return new Promise((resolve) => {
         if (this.diff + step >= done) {
           [this.dataList[this.m], this.dataList[this.n]] = [
