@@ -1,4 +1,5 @@
-async function shellSort(arr: Array<number>, swapFn: Function, peekAt: Function, assignAt: Function) {
+import type { TswapFn, TpeekAt, TassignAt } from './types';
+async function shellSort(arr: Array<number>, swapFn: TswapFn, peekAt: TpeekAt, assignAt: TassignAt) {
     for (let gap = arr.length; gap > 0; gap = (gap / 2) | 0) {
         for (let i = gap; i < arr.length; i++) {
             let val_i = await peekAt(i)

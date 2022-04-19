@@ -149,7 +149,7 @@ export default {
           this.n = -1;
           this.diff = 0;
           setTimeout(() => {
-            resolve(0);
+            resolve();
           }, this.speed);
         } else {
           let interval = setInterval(() => {
@@ -163,7 +163,7 @@ export default {
               this.n = -1;
               this.diff = 0;
               clearInterval(interval);
-              resolve(0);
+              resolve();
             }
           }, this.speed);
         }
@@ -182,7 +182,7 @@ export default {
       this.assigning = i;
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve(0);
+          resolve();
         }, this.speed);
       });
     },

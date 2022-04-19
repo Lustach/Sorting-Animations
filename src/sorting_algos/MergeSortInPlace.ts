@@ -1,4 +1,6 @@
-async function merge(arr: Array<number>, left: number, mid: number, right: number, swapFn: Function, peekAt: Function, assignAt: Function) {
+import type { TswapFn, TpeekAt, TassignAt } from './types';
+
+async function merge(arr: Array<number>, left: number, mid: number, right: number, swapFn: TswapFn, peekAt: TpeekAt, assignAt: TassignAt) {
     let left1 = left,
         right1 = mid,
         left2 = mid + 1,
@@ -27,7 +29,7 @@ async function merge(arr: Array<number>, left: number, mid: number, right: numbe
     }
 }
 
-async function mergeSortIP(arr: Array<number>, left: number, right: number, swapFn: Function, peekAt: Function, assignAt: Function) {
+async function mergeSortIP(arr: Array<number>, left: number, right: number, swapFn: TswapFn, peekAt: TpeekAt, assignAt: TassignAt) {
     if (left >= right) return
     let mid = (left + (right - left) / 2) | 0 //avoid overflow
     await mergeSortIP(arr, left, mid, swapFn, peekAt, assignAt)

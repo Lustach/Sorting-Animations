@@ -1,14 +1,15 @@
+import type { TswapFn, TpeekAt} from './types';
 // Checks if subarray is sorted
 // This is to escape the case when alot of repeating data
 // such that the algorithm gets too slow
-async function isSort(arr: Array<Number>, left: number, right: number, peekAt: Function) {
+async function isSort(arr: Array<Number>, left: number, right: number, peekAt: TpeekAt) {
     while (left < right) {
         if (await peekAt(left) > await peekAt(++left)) return false
     }
     return true
 }
 
-async function partition(arr: Array<Number>, pivot: number, left: number, right: number, swapFn: Function, peekAt: Function) {
+async function partition(arr: Array<Number>, pivot: number, left: number, right: number, swapFn: TswapFn, peekAt: TpeekAt) {
     if (await isSort(arr, left, right, peekAt)) return -1
     let pivotVal = await peekAt(pivot)
     while (left < right) {
@@ -29,7 +30,7 @@ async function partition(arr: Array<Number>, pivot: number, left: number, right:
     return left
 }
 
-async function quickSort(arr: Array<Number>, left: number, right: number, swapFn: Function, peekAt: Function) {
+async function quickSort(arr: Array<Number>, left: number, right: number, swapFn: TswapFn, peekAt: TpeekAt) {
     console.log(left, right);
     if (left >= right) return
     let pivot = (left / 2 + right / 2) | 0 //avoid overflow
